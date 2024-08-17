@@ -5,6 +5,7 @@ import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 
 
 data class LoginRequest(val email: String, val clave: String)
@@ -25,4 +26,10 @@ interface ApiService {
 
     @POST("biblioteca/devoluciones-libros")
     fun registrarDevolucion(@Body devolucionRequest: DevolucionRequest): Call<Void>
+
+    @POST("biblioteca/usuarios")
+    fun registerUsuario(@Body request: UsuarioRequest): Call<RegistroResponse>
+
+    @PUT("biblioteca/usuarios/cambiar-clave")
+    fun cambiarClave(@Body requestBody: Map<String, String>): Call<Void>
 }

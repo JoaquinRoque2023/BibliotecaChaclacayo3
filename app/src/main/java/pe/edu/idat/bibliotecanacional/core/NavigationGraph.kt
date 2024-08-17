@@ -26,5 +26,12 @@ fun NavigationGraph(navController: NavHostController) {
         composable("devolucionLibros") {
             DevolucionLibrosScreen(navController = navController)
         }
+        composable("registro") {
+            RegistroScreen(navController)
+        }
+        composable("cambiarClave") {
+            CambiarClaveScreen(navController)
+        }
+
     }
 }

@@ -1,6 +1,5 @@
 package pe.edu.idat.bibliotecanacional.screens
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -33,9 +32,10 @@ import pe.edu.idat.bibliotecanacional.network.RetrofitClient
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavHostController) {
+fun CambiarClaveScreen(navController: NavHostController) {
     var email by remember { mutableStateOf("") }
-    var clave by remember { mutableStateOf("") }
+    var claveAnterior by remember { mutableStateOf("") }
+    var nuevaClave by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Box(
@@ -48,23 +48,14 @@ fun LoginScreen(navController: NavHostController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(32.dp)
-                .background(Color.White, RoundedCornerShape(16.dp))
+                .background(Color.White)
                 .padding(24.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Logo",
-                modifier = Modifier.size(100.dp),
-                contentScale = ContentScale.Crop
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
             Text(
-                text = "Iniciar Sesión",
-                style = MaterialTheme.typography.headlineSmall.copy(
+                text = "Cambiar Contraseña",
+                style = MaterialTheme.typography.labelLarge.copy(
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF1976D2)
                 )
@@ -77,52 +68,64 @@ fun LoginScreen(navController: NavHostController) {
                 onValueChange = { email = it },
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.textFieldColors()
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = Color.Transparent
+                )
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             TextField(
-                value = clave,
-                onValueChange = { clave = it },
-                label = { Text("Clave") },
+                value = claveAnterior,
+                onValueChange = { claveAnterior = it },
+                label = { Text("Clave Anterior") },
                 modifier = Modifier.fillMaxWidth(),
                 visualTransformation = PasswordVisualTransformation(),
-                colors = TextFieldDefaults.textFieldColors()
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = Color.Transparent
+                )
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            TextField(
+                value = nuevaClave,
+                onValueChange = { nuevaClave = it },
+                label = { Text("Nueva Clave") },
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = PasswordVisualTransformation(),
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = Color.Transparent
+                )
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
-                    val loginRequest = LoginRequest(email, clave)
+                    val cambiarClaveRequest = mapOf(
+                        "email" to email,
+                        "claveAnterior" to claveAnterior,
+                        "nuevaClave" to nuevaClave
+                    )
 
-                    RetrofitClient.apiService.login(loginRequest)
-                        .enqueue(object : Callback<LoginResponse> {
+                    RetrofitClient.apiService.cambiarClave(cambiarClaveRequest)
+                        .enqueue(object : Callback<Void> {
                             override fun onResponse(
-                                call: Call<LoginResponse>,
-                                response: Response<LoginResponse>
+                                call: Call<Void>,
+                                response: Response<Void>
                             ) {
                                 if (response.isSuccessful) {
-                                    val loginResponse = response.body()
-                                    loginResponse?.let {
-                                        Log.d(
-                                            "LoginScreen",
-                                            "Inicio de sesión exitoso. Usuario: ${it.nombres} ${it.apellidoPaterno}"
-                                        )
-                                        navController.navigate("principal") {
-                                            popUpTo("login") { inclusive = true }
-                                        }
+                                    navController.navigate("login") {
+                                        popUpTo("cambiarClave") { inclusive = true }
                                     }
                                 } else {
-                                    errorMessage = "Usuario y/o contraseña no existe"
-                                    Log.e("LoginScreen", "Error en el inicio de sesión: ${response.message()}")
+                                    errorMessage = "Error en el cambio de contraseña"
                                 }
                             }
 
-                            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                            override fun onFailure(call: Call<Void>, t: Throwable) {
                                 errorMessage = "Error de red: ${t.message}"
-                                Log.e("LoginScreen", "Fallo en la red: ${t.message}")
                             }
                         })
                 },
@@ -132,40 +135,16 @@ fun LoginScreen(navController: NavHostController) {
                     contentColor = Color.White
                 )
             ) {
-                Text("Iniciar Sesión")
+                Text("Cambiar Contraseña")
             }
 
-            errorMessage?.let {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(it, color = MaterialTheme.colorScheme.error)
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            val annotatedText = buildAnnotatedString {
-                append("¿No tienes una cuenta? ")
-                pushStringAnnotation(tag = "REGISTRO", annotation = "registro")
-                withStyle(style = SpanStyle(color = Color(0xFF1976D2), fontWeight = FontWeight.Bold)) {
-                    append("Regístrate aquí")
-                }
-                pop()
-            }
-
-            ClickableText(
-                text = annotatedText,
-                onClick = { offset ->
-                    annotatedText.getStringAnnotations(tag = "REGISTRO", start = offset, end = offset)
-                        .firstOrNull()?.let {
-                            navController.navigate("registro")
-                        }
-                },
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
-                    navController.navigate("cambiarClave")
+                    navController.navigate("login") {
+                        popUpTo("cambiarClave") { inclusive = true }
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
@@ -173,14 +152,13 @@ fun LoginScreen(navController: NavHostController) {
                     contentColor = Color.White
                 )
             ) {
-                Text("Cambiar Contraseña")
+                Text("Volver al Login")
             }
 
             errorMessage?.let {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(it, color = MaterialTheme.colorScheme.error)
             }
-
         }
     }
 }
