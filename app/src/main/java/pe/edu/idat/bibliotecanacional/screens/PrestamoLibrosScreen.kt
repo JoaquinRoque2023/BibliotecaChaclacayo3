@@ -14,8 +14,13 @@ import retrofit2.Callback
 import retrofit2.Response
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.Alignment
+import pe.edu.idat.bibliotecanacional.network.LibroR
+import pe.edu.idat.bibliotecanacional.network.LibroRequest
+import pe.edu.idat.bibliotecanacional.network.Usuario
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrestamoLibrosScreen(navController: NavHostController) {
     var libroId by remember { mutableStateOf("") }
@@ -23,7 +28,9 @@ fun PrestamoLibrosScreen(navController: NavHostController) {
     var mensaje by remember { mutableStateOf<String?>(null) }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -47,20 +54,44 @@ fun PrestamoLibrosScreen(navController: NavHostController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
-            val prestamoRequest = PrestamoRequest(libroId.toInt(), userId.toInt())
-            RetrofitClient.apiService.registrarPrestamo(prestamoRequest).enqueue(object : Callback<Void> {
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                    mensaje = if (response.isSuccessful) {
-                        "Préstamo registrado exitosamente"
-                    } else {
-                        "Error al registrar el préstamo"
-                    }
-                }
+            val prestamoRequest = PrestamoRequest(
+                usuario = Usuario(idUsuario = userId.toInt()),  // Crear un objeto Usuario
+                libro = LibroR(idLibro = libroId.toInt())       // Crear un objeto Libro
+            )
 
-                override fun onFailure(call: Call<Void>, t: Throwable) {
-                    mensaje = "Fallo de red: ${t.message}"
-                }
-            })
+            // Registrar el préstamo del libro
+            RetrofitClient.apiService.registrarPrestamo(prestamoRequest)
+                .enqueue(object : Callback<Void> {
+                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                        if (response.isSuccessful) {
+                            // Cambiar el estado del libro a INACTIVO
+                            val libroInactivo = LibroRequest(
+                                idLibro = libroId.toInt(),
+                                estado = "INACTIVO" // Establecer el estado a INACTIVO
+                            )
+                            RetrofitClient.apiService.actualizarEstadoLibro(libroId.toInt(), libroInactivo)
+                                .enqueue(object : Callback<Void> {
+                                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                                        mensaje = if (response.isSuccessful) {
+                                            "Préstamo registrado y libro actualizado exitosamente"
+                                        } else {
+                                            "Error al actualizar el estado del libro"
+                                        }
+                                    }
+
+                                    override fun onFailure(call: Call<Void>, t: Throwable) {
+                                        mensaje = "Fallo de red al actualizar el libro: ${t.message}"
+                                    }
+                                })
+                        } else {
+                            mensaje = "Error al registrar el préstamo"
+                        }
+                    }
+
+                    override fun onFailure(call: Call<Void>, t: Throwable) {
+                        mensaje = "Fallo de red: ${t.message}"
+                    }
+                })
         }) {
             Text("Registrar Préstamo")
         }
@@ -75,3 +106,4 @@ fun PrestamoLibrosScreen(navController: NavHostController) {
         }
     }
 }
+

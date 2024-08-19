@@ -15,8 +15,14 @@ import retrofit2.Callback
 import retrofit2.Response
 import android.util.Log
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.Alignment
+import pe.edu.idat.bibliotecanacional.network.LibroR
+import pe.edu.idat.bibliotecanacional.network.LibroRequest
+import pe.edu.idat.bibliotecanacional.network.PrestamoRequest
+import pe.edu.idat.bibliotecanacional.network.Usuario
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DevolucionLibrosScreen(navController: NavHostController) {
     var libroId by remember { mutableStateOf("") }
@@ -39,11 +45,17 @@ fun DevolucionLibrosScreen(navController: NavHostController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
-            val devolucionRequest = DevolucionRequest(libroId.toInt())
-            RetrofitClient.apiService.registrarDevolucion(devolucionRequest).enqueue(object : Callback<Void> {
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+            val libroActivo = LibroRequest(
+                idLibro = libroId.toInt(),
+                estado = "ACTIVO" // Establecer el estado a INACTIVO
+            )  // Preparing the request body with "ACTIVO" state
+
+            // Make the PUT request to update the book status to "ACTIVO"
+            RetrofitClient.apiService.actualizarEstadoLibro(libroId.toInt(), libroActivo)
+                .enqueue(object : Callback<Void> {
+                    override fun onResponse(call: Call<Void>, response: Response<Void>)  {
                     mensaje = if (response.isSuccessful) {
-                        "Devolución registrada exitosamente"
+                        "Devolución registrada y estado del libro actualizado a ACTIVO"
                     } else {
                         "Error al registrar la devolución"
                     }

@@ -32,6 +32,17 @@ fun NavigationGraph(navController: NavHostController) {
         composable("cambiarClave") {
             CambiarClaveScreen(navController)
         }
-
+        composable("actualizarDatos/{usuarioId}") { backStackEntry ->
+            val usuarioId = backStackEntry.arguments?.getString("usuarioId")?.toInt() ?: 0
+            ActualizarDatosUsuarioScreen(navController, usuarioId)
+        }
+        composable("probarNotificaciones") { ProbarNotificacionesScreen(navController) }
+        composable("reservasEspacios") {
+            ReservasEspaciosScreen(navController = navController)
+        }
+        composable("registrarReserva") {
+            RegistrarReservaScreen(navController = navController)
+        }
     }
 }
+

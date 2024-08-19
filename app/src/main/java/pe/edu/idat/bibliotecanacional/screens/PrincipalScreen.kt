@@ -33,5 +33,23 @@ fun PrincipalScreen(navController: NavHostController) {
         Button(onClick = { navController.navigate("devolucionLibros") }) {
             Text("Devolución de Libros")
         }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Botón para actualizar datos del usuario
+        Button(onClick = {
+            val usuarioId = 2 // Reemplazar con el ID real del usuario
+            navController.navigate("actualizarDatos/$usuarioId")
+        }) {
+            Text("Actualizar Datos del Usuario")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Nuevo botón para gestionar reservas de espacios
+        Button(onClick = {
+            navController.navigate("reservasEspacios")
+        }) {
+            Text("Reservas de Espacios")
+        }
     }
 }
+

@@ -6,6 +6,8 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Path
+import retrofit2.http.Query
 
 
 data class LoginRequest(val email: String, val clave: String)
@@ -32,4 +34,24 @@ interface ApiService {
 
     @PUT("biblioteca/usuarios/cambiar-clave")
     fun cambiarClave(@Body requestBody: Map<String, String>): Call<Void>
+
+    @PUT("biblioteca/libros/{id}")
+    fun actualizarEstadoLibro(@Path("id") idLibro: Int, @Body libro: LibroRequest): Call<Void>
+
+    @PUT("biblioteca/usuarios/{id}")
+    fun actualizarUsuario(
+        @Path("id") id: Int,
+        @Body usuarioRequest: UsuarioUpdateRequest
+    ): Call<Void>
+
+
+        @POST("biblioteca/alertas")
+        fun enviarAlerta(@Body alertaRequest: AlertaRequest): Call<Void>
+
+    @GET("biblioteca/reservas-espacios-comunes")
+    fun listarReservas(): Call<List<ReservaEspacio>>
+
+    @POST("biblioteca/reservas-espacios-comunes")
+    fun registrarReserva(@Body reservaRequest: ReservaRequest): Call<Void>
+
 }

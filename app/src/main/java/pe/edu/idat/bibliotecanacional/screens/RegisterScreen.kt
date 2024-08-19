@@ -1,33 +1,29 @@
 package pe.edu.idat.bibliotecanacional.screens
 
-import androidx.compose.foundation.Image
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.withStyle
+
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+
 import androidx.navigation.NavHostController
-import android.util.Log
-import androidx.compose.foundation.shape.RoundedCornerShape
-import pe.edu.idat.bibliotecanacional.R
+
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import pe.edu.idat.bibliotecanacional.network.UsuarioRequest
-import pe.edu.idat.bibliotecanacional.network.LoginResponse
+
 import pe.edu.idat.bibliotecanacional.network.RegistroResponse
 import pe.edu.idat.bibliotecanacional.network.RetrofitClient
 
@@ -60,7 +56,7 @@ fun RegistroScreen(navController: NavHostController) {
         ) {
             Text(
                 text = "Registro de Usuario",
-                style = MaterialTheme.typography.labelLarge.copy(
+                style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF1976D2)
                 )
